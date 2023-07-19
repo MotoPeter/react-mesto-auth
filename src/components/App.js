@@ -13,7 +13,7 @@ import { Routes, Navigate, Route } from "react-router-dom";
 import Register from "./Register";
 import Login from "./Login";
 import InfoTooltip from "./InfoTooltip";
-import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRouteElement from "./ProtectedRoute";
 import { Link, useNavigate } from "react-router-dom";
 import * as mestoAuth from "../utils/mestoAuth.js";
 import imgOk from "../images/img-ok.png";
@@ -31,6 +31,8 @@ function App() {
 	const [isRegister, setIsRegister] = useState(false);
 
 	const navigate = useNavigate();
+
+  console.log(isLoggedIn);
 
 	function handleCardLike(card) {
 		const isLiked = card.likes.some((i) => i._id === currentUser._id);
@@ -138,8 +140,10 @@ function App() {
 	const handleLoginSubmit = (formValue) => {
 		const { password, email } = formValue;
 		console.log({ password, email });
-    setIsLoggedIn(true)
-    navigate("/", { replace: true })
+    console.log(isLoggedIn);
+		setIsLoggedIn(true);
+		navigate("/a", { replace: true });
+    console.log(isLoggedIn);
 		//mestoAuth
 		//	.authorization(password, email).then(() => {
 		//    navigate("/", { replace: true });
@@ -172,18 +176,17 @@ function App() {
 						path="/"
 						element={
 							isLoggedIn ? (
-								<Navigate to="/" replace />
+								<Navigate to="/a" replace />
 							) : (
 								<Navigate to="/sign-in" replace />
 							)
 						}
 					/>
 					<Route
-						path="/"
+						path="/a"
 						element={
-							<ProtectedRoute
-								path="/"
-								loggedIn={isLoggedIn}
+							<ProtectedRouteElement
+              path='/a'
 								element={
 									<>
 										<Header />
@@ -199,6 +202,7 @@ function App() {
 										<Footer />
 									</>
 								}
+								loggedIn={isLoggedIn}
 							/>
 						}
 					/>

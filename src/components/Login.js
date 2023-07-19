@@ -3,7 +3,7 @@ import Header from "./Header";
 import AuthForm from "./AuthForm";
 
 const Login = ({handleLoginSubmit}) => {
-  console.log(handleLoginSubmit);
+ 
 	return (
 		<div>
 			<Header />
