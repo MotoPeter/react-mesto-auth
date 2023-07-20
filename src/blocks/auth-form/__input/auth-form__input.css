@@ -5,7 +5,7 @@
 	font-size: 14px;
 	line-height: 17px;
 	margin: 0;
-  border: none;
+	border: none;
 	border-bottom: 2px solid #ccc;
 	background-color: #000;
 	color: #fff;
@@ -13,5 +13,5 @@
 
 .auth-form__input:last-of-type {
 	margin-top: 30px;
-  margin-bottom: 216px;
+	margin-bottom: 216px;
 }

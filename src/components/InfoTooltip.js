@@ -1,7 +1,6 @@
 import React from "react";
 
 const InfoTooltip = ({ title, name, isOpen, onClose, imgSrc, imgAlt }) => {
-
 	function clickClosePopap(e) {
 		//  //если область клика содержит дочерний элемент - открытый попап
 		if (e.target.classList.contains("popup_openend")) {
@@ -33,9 +32,9 @@ const InfoTooltip = ({ title, name, isOpen, onClose, imgSrc, imgAlt }) => {
 					type="button"
 					className="popup__close button button_condition_hover"
 					onClick={onClose}
-				></button>				
-					<img className="tooltip__img" src={imgSrc} alt={imgAlt}></img>
-					<h3 className="tooltip__title">{title}</h3>				
+				></button>
+				<img className="tooltip__img" src={imgSrc} alt={imgAlt}></img>
+				<h3 className="tooltip__title">{title}</h3>
 			</div>
 		</div>
 	);

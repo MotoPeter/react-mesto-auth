@@ -43,7 +43,7 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
 						<input
 							id="name-input"
 							name="name"
-							value={name || ''}
+							value={name || ""}
 							placeholder="Имя"
 							required
 							autoComplete="off"
@@ -59,7 +59,7 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
 						<input
 							id="ocupation-input"
 							name="about"
-							value={description || ''}
+							value={description || ""}
 							placeholder="Род занятий"
 							required
 							autoComplete="off"

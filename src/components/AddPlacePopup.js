@@ -8,8 +8,8 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
 	const [link, setLink] = React.useState("");
 
 	React.useEffect(() => {
-		placeTitleRef.current.value = '';
-    placeLinkRef.current.value= '';
+		placeTitleRef.current.value = "";
+		placeLinkRef.current.value = "";
 	}, [isOpen]);
 
 	function handleSubmit(e) {

@@ -2,11 +2,10 @@ import React from "react";
 import Header from "./Header";
 import AuthForm from "./AuthForm";
 
-const Login = ({handleLoginSubmit}) => {
- 
+const Login = ({ handleLoginSubmit }) => {
 	return (
 		<div>
-			<Header />
+			<Header linkTitle={"Регистрация"} linkTo={"/sign-up"} />
 			<AuthForm
 				onSubmit={handleLoginSubmit}
 				title={"Вход"}

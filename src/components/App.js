@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "./Footer";
 import Header from "./Header";
 import ImagePopup from "./ImagePopup";
@@ -9,12 +9,11 @@ import { api } from "../utils/api.js";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
-import { Routes, Navigate, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Register from "./Register";
 import Login from "./Login";
 import InfoTooltip from "./InfoTooltip";
 import ProtectedRouteElement from "./ProtectedRoute";
-import { Link, useNavigate } from "react-router-dom";
 import * as mestoAuth from "../utils/mestoAuth.js";
 import imgOk from "../images/img-ok.png";
 import imgNone from "../images/img-none.png";
@@ -29,14 +28,38 @@ function App() {
 	const [isInfoTooltipPopup, setIsInfoTooltipPopup] = useState(false);
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const [isRegister, setIsRegister] = useState(false);
+	const [userData, setUserData] = useState({
+		id: "",
+		email: "",
+	});
 
 	const navigate = useNavigate();
 
-  console.log(isLoggedIn);
+	useEffect(() => {
+		tokenCheck();
+	}, []);
+
+	const tokenCheck = () => {
+		if (localStorage.getItem("token")) {
+			const token = localStorage.getItem("token");
+			if (token) {
+				mestoAuth.getContent(token).then((res) => {
+					if (res) {
+						const userData = {
+							id: res.data._id,
+							email: res.data.email,
+						};
+						setIsLoggedIn(true);
+						setUserData(userData);
+						navigate("/", { replace: true });
+					}
+				});
+			}
+		}
+	};
 
 	function handleCardLike(card) {
 		const isLiked = card.likes.some((i) => i._id === currentUser._id);
-
 		api
 			.changeLikeCardStatus(card, !isLiked)
 			.then((newCard) => {
@@ -60,7 +83,7 @@ function App() {
 			});
 	}
 
-	React.useEffect(() => {
+	useEffect(() => {
 		Promise.all([api.getInitialCards(), api.getUserInfo()])
 			.then(([initialCards, userInfo]) => {
 				setCards(initialCards);
@@ -69,7 +92,7 @@ function App() {
 			.catch((err) => {
 				console.log(err.status);
 			});
-	}, [isLoggedIn]);
+	}, []);
 
 	function handleEditAvatarClick() {
 		setIsEditAvatarPopupOpen(true);
@@ -139,15 +162,15 @@ function App() {
 
 	const handleLoginSubmit = (formValue) => {
 		const { password, email } = formValue;
-		console.log({ password, email });
-    console.log(isLoggedIn);
-		setIsLoggedIn(true);
-		navigate("/a", { replace: true });
-    console.log(isLoggedIn);
-		//mestoAuth
-		//	.authorization(password, email).then(() => {
-		//    navigate("/", { replace: true });
-		//  })
+		mestoAuth
+			.authorization(password, email)
+			.then((data) => {
+				if (data.token) {
+					localStorage.setItem("token", data.token);
+					tokenCheck();
+				}
+			})
+			.catch((err) => console.log(err));
 	};
 
 	const inCaseRegister = () => {
@@ -157,6 +180,23 @@ function App() {
 
 	const tooltipOpen = () => {
 		setIsInfoTooltipPopup(true);
+	};
+
+	useEffect(() => {
+		if (isInfoTooltipPopup)
+			setTimeout(() => {
+				closeAllPopups();
+			}, 2000);
+	}, [isInfoTooltipPopup]);
+
+	const handleExit = () => {
+		localStorage.removeItem("token");
+		setIsLoggedIn(false);
+		setUserData({
+			id: "",
+			email: "",
+		});
+		navigate("/sign-in", { replace: true });
 	};
 
 	return (
@@ -175,35 +215,27 @@ function App() {
 					<Route
 						path="/"
 						element={
-							isLoggedIn ? (
-								<Navigate to="/a" replace />
-							) : (
-								<Navigate to="/sign-in" replace />
-							)
-						}
-					/>
-					<Route
-						path="/a"
-						element={
-							<ProtectedRouteElement
-              path='/a'
-								element={
-									<>
-										<Header />
-										<Main
-											onEditAvatar={handleEditAvatarClick}
-											onEditProfile={handleEditProfileClick}
-											onAddPlace={handleAddPlaceClick}
-											handleCardClick={handleCardClick}
-											handleCardLike={handleCardLike}
-											cards={cards}
-											handleCardDel={handleCardDel}
-										/>
-										<Footer />
-									</>
-								}
-								loggedIn={isLoggedIn}
-							/>
+							<ProtectedRouteElement loggedIn={isLoggedIn}>
+								<>
+									<Header
+										linkTitle={"Выйти"}
+										linkTo={"/sign-in"}
+										handleExit={handleExit}
+									>
+										{userData.email}
+									</Header>
+									<Main
+										onEditAvatar={handleEditAvatarClick}
+										onEditProfile={handleEditProfileClick}
+										onAddPlace={handleAddPlaceClick}
+										handleCardClick={handleCardClick}
+										handleCardLike={handleCardLike}
+										cards={cards}
+										handleCardDel={handleCardDel}
+									/>
+									<Footer />
+								</>
+							</ProtectedRouteElement>
 						}
 					/>
 				</Routes>

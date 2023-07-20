@@ -1,27 +1,25 @@
 import React from "react";
-import { Link } from 'react-router-dom';
 
-const AuthForm = ({ onSubmit, title, buttonSubmitText }) => {
+const AuthForm = ({ onSubmit, title, buttonSubmitText, ...props }) => {
+	const [formValue, setFormValue] = React.useState({
+		email: "",
+		password: "",
+	});
 
-  const [formValue, setFormValue] = React.useState({
-    email: '',
-    password: '',
-  })
-  
-  const handleChange = (e) => {
-    const {name, value} = e.target;
+	const handleChange = (e) => {
+		const { name, value } = e.target;
 
-    setFormValue({
-      ...formValue,
-      [name]: value
-    });
-  }
+		setFormValue({
+			...formValue,
+			[name]: value,
+		});
+	};
 
-  const onSubmitAuthForm = (e) => {
-    e.preventDefault();
-    onSubmit(formValue)    
-  }
-  
+	const onSubmitAuthForm = (e) => {
+		e.preventDefault();
+		onSubmit(formValue);
+	};
+
 	return (
 		<>
 			<form className="auth-form" name={"name"} noValidate>
@@ -32,12 +30,12 @@ const AuthForm = ({ onSubmit, title, buttonSubmitText }) => {
 					id="email"
 					type="email"
 					placeholder="Email"
-					value={formValue.email || ''}
+					value={formValue.email || ""}
 					minLength="5"
 					maxLength="50"
 					required
 					autoComplete="off"
-          onChange={handleChange}
+					onChange={handleChange}
 				/>
 				<input
 					className="auth-form__input"
@@ -46,22 +44,21 @@ const AuthForm = ({ onSubmit, title, buttonSubmitText }) => {
 					id="password"
 					type="password"
 					placeholder="Пароль"
-					value={formValue.password || ''}
+					value={formValue.password || ""}
 					minLength="4"
 					maxLength="20"
 					required
 					autoComplete="off"
-          onChange={handleChange}
+					onChange={handleChange}
 				/>
-				<button className="auth-form__button" type="submit" onClick={onSubmitAuthForm}>
+				<button
+					className="auth-form__button button_condition_hover"
+					type="submit"
+					onClick={onSubmitAuthForm}
+				>
 					{buttonSubmitText}
 				</button>
-				<p className="auth-form__footer">
-					Уже зарегистрированы?
-					<Link to="/sign-in" style={{ textDecoration: "none" }} className="button_condition_hover">
-						<span style={{margin:0, color:'white', marginLeft:4}}> Войти</span>
-					</Link>
-				</p>
+				{props.children}
 			</form>
 		</>
 	);

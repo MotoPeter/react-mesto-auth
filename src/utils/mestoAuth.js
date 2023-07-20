@@ -19,8 +19,6 @@ export const register = (password, email, tooltipOpen, inCaseRegister) => {
 			}
 		})
 		.then((res) => {
-			//console.log(res.data._id);
-			//localStorage.setItem('token', res.data._id);
 			tooltipOpen();
 			return res;
 		})
@@ -34,20 +32,25 @@ export const authorization = (password, email) => {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({ password: password, email: email }),
-	})
-		.then((res) => {
-			try {
-				if (res.status >= 200 && res.status < 300) {
-					return res.json();
-				}
-			} catch (e) {
-				return e;
+	}).then((res) => {
+		try {
+			if (res.status >= 200 && res.status < 300) {
+				return res.json();
 			}
-		})
-		.then((res) => {
-			console.log(res.data._id);
-			//localStorage.setItem('token', res.data._id);
-			return res;
-		})
-		.catch((err) => console.log(err));
+		} catch (e) {
+			return e;
+		}
+	});
+};
+
+export const getContent = (token) => {
+	return fetch(`${BASE_URL}/users/me`, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	})
+		.then((res) => res.json())
+		.then((data) => data);
 };

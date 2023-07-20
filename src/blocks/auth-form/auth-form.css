@@ -1,6 +1,6 @@
 .auth-form {
 	margin: auto;
-  margin-top: 60px;
+	margin-top: 60px;
 	padding: 0;
 	box-sizing: border-box;
 	width: 358px;
@@ -8,15 +8,8 @@
 	flex-direction: column;
 }
 
-
-/*@media screen and (max-width: 550px) {
-	.auth-form {		
-    max-width: fit-content;
-	}
-}*/
-
 @media screen and (max-width: 400px) {
-	.auth-form {		
-    width: 260px
+	.auth-form {
+		width: 260px;
 	}
 }
