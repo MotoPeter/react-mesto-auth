@@ -18,8 +18,9 @@ function Main({
 		<main className="content">
 			<section className="profile">
 				<img
-					style={{ backgroundImage: `url(${currentUser.avatar})` }}
+					src={`${currentUser.avatar}`}
 					className="profile__avatar"
+					alt="аватар"
 				/>
 				<button
 					className="profile__avatar-button"

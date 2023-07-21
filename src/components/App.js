@@ -19,7 +19,7 @@ import imgOk from "../images/img-ok.png";
 import imgNone from "../images/img-none.png";
 
 function App() {
-	const [currentUser, setCurrentUser] = useState([]);
+	const [currentUser, setCurrentUser] = useState({});
 	const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
 	const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
 	const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
@@ -32,6 +32,7 @@ function App() {
 		id: "",
 		email: "",
 	});
+	const [isLoading, setIsLoading] = React.useState(false);
 
 	const navigate = useNavigate();
 
@@ -42,8 +43,9 @@ function App() {
 	const tokenCheck = () => {
 		if (localStorage.getItem("token")) {
 			const token = localStorage.getItem("token");
-			if (token) {
-				mestoAuth.getContent(token).then((res) => {
+			mestoAuth
+				.getContent(token)
+				.then((res) => {
 					if (res) {
 						const userData = {
 							id: res.data._id,
@@ -53,8 +55,10 @@ function App() {
 						setUserData(userData);
 						navigate("/", { replace: true });
 					}
+				})
+				.catch((err) => {
+					console.log(err.status);
 				});
-			}
 		}
 	};
 
@@ -119,6 +123,7 @@ function App() {
 	}
 
 	function handleUpdateUser({ name, about }) {
+		setIsLoading(true);
 		api
 			.editProfile({ name, about })
 			.then((userInfo) => {
@@ -127,10 +132,12 @@ function App() {
 			})
 			.catch((err) => {
 				console.log(err.status);
-			});
+			})
+			.finally(() => setIsLoading());
 	}
 
 	function handleUpdateAvatar({ avatar }) {
+		setIsLoading(true);
 		api
 			.editAvatar({ avatar })
 			.then((userInfo) => {
@@ -139,25 +146,40 @@ function App() {
 			})
 			.catch((err) => {
 				console.log(err.status);
-			});
+			})
+			.finally(() => setIsLoading());
 	}
 
 	function handleAddPlaceSubmit({ name, link }) {
+		setIsLoading(true);
 		api
 			.addNewCard({ name, link })
 			.then((newCard) => {
 				setCards([newCard, ...cards]);
 				closeAllPopups();
 			})
-			.catch((err) => {
-				console.log(err.status);
-			});
+			.catch(console.error)
+			.finally(() => setIsLoading());
 	}
 
 	const handleRegistrSubmit = (formValue) => {
 		const { password, email } = formValue;
-		setIsRegister(false);
-		mestoAuth.register(password, email, tooltipOpen, inCaseRegister);
+		mestoAuth
+			.register(
+				password,
+				email,
+				tooltipOpen,
+				inCaseRegister,
+				setIsRegister,
+				isRegister
+			)
+			.then((res) => {
+				console.log(res.data);
+			})
+			.catch((err) => console.log(err))
+			.finally(() => {
+				tooltipOpen();
+			});
 	};
 
 	const handleLoginSubmit = (formValue) => {
@@ -170,7 +192,9 @@ function App() {
 					tokenCheck();
 				}
 			})
-			.catch((err) => console.log(err));
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
 	const inCaseRegister = () => {
@@ -244,12 +268,14 @@ function App() {
 					isOpen={isEditProfilePopupOpen && "popup_openend"}
 					onClose={closeAllPopups}
 					onUpdateUser={handleUpdateUser}
+					isLoading={isLoading}
 				/>
 
 				<AddPlacePopup
 					isOpen={isAddPlacePopupOpen && "popup_openend"}
 					onClose={closeAllPopups}
 					onAddPlace={handleAddPlaceSubmit}
+					isLoading={isLoading}
 				/>
 
 				<PopupWithForm
@@ -262,6 +288,7 @@ function App() {
 					isOpen={isEditAvatarPopupOpen && "popup_openend"}
 					onClose={closeAllPopups}
 					onUpdateAvatar={handleUpdateAvatar}
+					isLoading={isLoading}
 				/>
 
 				{selectedCard && (

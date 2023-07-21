@@ -1,28 +1,21 @@
 export const BASE_URL = "https://auth.nomoreparties.co";
 
-export const register = (password, email, tooltipOpen, inCaseRegister) => {
+export const register = (password, email, inCaseRegister, setIsRegister) => {
 	return fetch(`${BASE_URL}/signup`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({ password: password, email: email }),
-	})
-		.then((res) => {
-			try {
-				if (res.status >= 200 && res.status < 300) {
-					inCaseRegister();
-					return res.json();
-				}
-			} catch (e) {
-				return e;
-			}
-		})
-		.then((res) => {
-			tooltipOpen();
-			return res;
-		})
-		.catch((err) => console.log(err));
+	}).then((res) => {
+		if (res.ok) {
+			setIsRegister(true);
+			inCaseRegister();
+			return res.json();
+		}
+		setIsRegister(false);
+		return Promise.reject(`Ошибка: ${res.status}`);
+	});
 };
 
 export const authorization = (password, email) => {
@@ -33,13 +26,10 @@ export const authorization = (password, email) => {
 		},
 		body: JSON.stringify({ password: password, email: email }),
 	}).then((res) => {
-		try {
-			if (res.status >= 200 && res.status < 300) {
-				return res.json();
-			}
-		} catch (e) {
-			return e;
+		if (res.ok) {
+			return res.json();
 		}
+		return Promise.reject(`Ошибка: ${res.status}`);
 	});
 };
 
@@ -50,7 +40,10 @@ export const getContent = (token) => {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,
 		},
-	})
-		.then((res) => res.json())
-		.then((data) => data);
+	}).then((res) => {
+		if (res.ok) {
+			return res.json();
+		}
+		return Promise.reject(`Ошибка: ${res.status}`);
+	});
 };

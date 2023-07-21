@@ -35,10 +35,7 @@ function Card({ card, handleCardClick, onCardLike, onCardDel }) {
 				className="button place__image-button popup__save_condition_hover"
 				onClick={cardClick}
 			>
-				<img
-					style={{ backgroundImage: `url(${card.link})` }}
-					className="place__image"
-				/>
+				<img src={`${card.link}`} alt={card.name} className="place__image" />
 			</button>
 			<div className="place__text">
 				<h2 className="place__title">{card.name}</h2>

@@ -24,7 +24,6 @@ function PopupWithForm({
 	}, [isOpen]);
 
 	function clickClosePopap(e) {
-		//  //если область клика содержит дочерний элемент - открытый попап
 		if (e.target.classList.contains("popup_openend")) {
 			onClose();
 		}
@@ -40,14 +39,9 @@ function PopupWithForm({
 					type="button"
 					className="popup__close button button_condition_hover"
 					onClick={onClose}
-				></button>
+				/>
 				<h3 className="popup__title">{title}</h3>
-				<form
-					className="popup__form"
-					name={name}
-					noValidate
-					onSubmit={onSubmit}
-				>
+				<form className="popup__form" name={name} onSubmit={onSubmit}>
 					{children}
 					<button
 						type="submit"
