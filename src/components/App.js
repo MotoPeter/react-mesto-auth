@@ -165,18 +165,17 @@ function App() {
 	const handleRegistrSubmit = (formValue) => {
 		const { password, email } = formValue;
 		mestoAuth
-			.register(
-				password,
-				email,
-				tooltipOpen,
-				inCaseRegister,
-				setIsRegister,
-				isRegister
-			)
+			.register(password, email)
 			.then((res) => {
-				console.log(res.data);
+				setIsRegister(true);
+				tooltipOpen();
+				inCaseRegister();
 			})
-			.catch((err) => console.log(err))
+			.catch((err) => {
+				setIsRegister(false);
+				tooltipOpen();
+				console.log(err);
+			})
 			.finally(() => {
 				tooltipOpen();
 			});
@@ -187,6 +186,7 @@ function App() {
 		mestoAuth
 			.authorization(password, email)
 			.then((data) => {
+				console.log(data);
 				if (data.token) {
 					localStorage.setItem("token", data.token);
 					tokenCheck();
@@ -199,7 +199,7 @@ function App() {
 
 	const inCaseRegister = () => {
 		navigate("/sign-in", { replace: true });
-		setIsRegister(true);
+		//setIsRegister(true);
 	};
 
 	const tooltipOpen = () => {
