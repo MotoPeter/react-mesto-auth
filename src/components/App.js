@@ -72,7 +72,6 @@ function App() {
 					}
 				})
 				.catch(console.error);
-		}
 	};
 
 	function handleCardLike(card) {
