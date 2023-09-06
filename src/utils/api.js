@@ -25,6 +25,7 @@ class Api {
 	//получение данных пользователя с сервера
 	getUserInfo() {
 		return fetch(`${this._url}/users/me`, {
+      credentials: 'include',
 			headers: this._headers,
 		}).then(this._checkResponse);
 	}
@@ -32,6 +33,7 @@ class Api {
 	//редактирование профиля на вход массив с именем и профессией
 	editProfile({ name, about }) {
 		return fetch(`${this._url}/users/me`, {
+      credentials: 'include',
 			//метод для частичного обновления
 			method: "PATCH",
 			headers: this._headers,
@@ -47,6 +49,7 @@ class Api {
 	//отправка на сервер новой карточки
 	addNewCard(formValues) {
 		return fetch(`${this._url}/cards`, {
+      credentials: 'include',
 			//метод для отправки данных
 			method: "POST",
 			headers: this._headers,
@@ -61,6 +64,7 @@ class Api {
 	editAvatar({ avatar }) {
 		return fetch(`${this._url}/users/me/avatar`, {
 			method: "PATCH",
+      credentials: 'include',
 			headers: this._headers,
 			body: JSON.stringify({
 				avatar,
@@ -72,6 +76,7 @@ class Api {
 		return fetch(`${this._url}/cards/${place._id}`, {
 			//метод для отправки данных
 			method: "DELETE",
+      credentials: 'include',
 			headers: this._headers,
 		}).then(this._checkResponse);
 	}
@@ -80,6 +85,7 @@ class Api {
 	putLike(place) {
 		return fetch(`${this._url}/cards/${place._id}/likes`, {
 			method: "PUT",
+      credentials: 'include',
 			headers: this._headers,
 		}).then(this._checkResponse);
 	}
@@ -88,6 +94,7 @@ class Api {
 	delLike(place) {
 		return fetch(`${this._url}/cards/${place._id}/likes`, {
 			method: "DELETE",
+      credentials: 'include',
 			headers: this._headers,
 		}).then(this._checkResponse);
 	}
@@ -105,8 +112,8 @@ class Api {
 export const api = new Api(
 	"https://api.mesto.motopeter.nomoredomainsicu.ru",
 	{
+    authorization: localStorage.getItem('jwt'),
 		"Content-Type": "application/json",
-    credentials: 'include',
 	},
   //функция проверки ответа от сервера
 	checkResponse

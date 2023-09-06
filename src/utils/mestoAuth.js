@@ -14,7 +14,7 @@ export const register = (password, email) => {
 };
 
 //запрос на сервер при авторизации - пароль и емаил
-export const authorization = (password, email) => {
+export const authorization = (password, email, token) => {
 	return fetch(`${BASE_URL}/signin`, {
 		method: "POST",
 		headers: {
@@ -25,12 +25,13 @@ export const authorization = (password, email) => {
 };
 
 //запрос на сервер проверки токена
-export const getContent = () => {
+export const getContent = (token) => {
 	return fetch(`${BASE_URL}/users/me`, {
 		method: "GET",
-    credentials: 'include',
 		headers: {
+			Accept: "application/json",
 			"Content-Type": "application/json",
+			authorization: token,
 		},
 	}).then(checkResponse);
 };
