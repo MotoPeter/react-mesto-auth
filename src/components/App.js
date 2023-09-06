@@ -56,10 +56,10 @@ function App() {
 	}, []);
 
 	const tokenCheck = () => {
-		//if (localStorage.getItem("token")) {
-		//	const token = localStorage.getItem("token");
+		if (localStorage.getItem("token")) {
+			const token = localStorage.getItem("token");
 			mestoAuth
-				.getContent()
+				.getContent(token)
 				.then((res) => {
 					if (res) {
 						const userData = {

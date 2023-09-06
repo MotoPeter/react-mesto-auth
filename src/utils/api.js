@@ -101,14 +101,12 @@ class Api {
 	}
 }
 
-//токен для авторизации
-const token = "6eeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGY4M2JlZmEwYjkwNzRiYjhiYjQ0MmQiLCJpYXQiOjE2OTM5OTYzMjMsImV4cCI6MTY5NDYwMTEyM30.EdZwltUwU0AIuxLNu2BokFATIOa9nWlkS1oFxCV8jOwa24768-e3b3-4cce-a68a-3bff993d63e5";
 //создаем элемент api
 export const api = new Api(
 	"https://api.mesto.motopeter.nomoredomainsicu.ru",
 	{
-		authorization: token,
 		"Content-Type": "application/json",
+    credentials: 'include',
 	},
   //функция проверки ответа от сервера
 	checkResponse
