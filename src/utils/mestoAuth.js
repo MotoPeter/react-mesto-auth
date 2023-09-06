@@ -25,12 +25,12 @@ export const authorization = (password, email) => {
 };
 
 //запрос на сервер проверки токена
-export const getContent = (token) => {
+export const getContent = () => {
 	return fetch(`${BASE_URL}/users/me`, {
 		method: "GET",
+    credentials: 'include',
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
 	}).then(checkResponse);
 };
