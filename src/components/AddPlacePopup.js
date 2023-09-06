@@ -1,12 +1,19 @@
 import React from "react";
 import PopupWithForm from "./PopupWithForm";
+import { AppContext } from "../contexts/AppContext";
 
-function AddPlacePopup({ isOpen, onClose, onAddPlace, isLoading }) {
+function AddPlacePopup({ isOpen,  onAddPlace }) {
+
+  //контекст состояния загрузки и функциизакрытия попапа
+  const value = React.useContext(AppContext)
+
+  //переменная состояния новой карточки
 	const [newPlace, setNewPlace] = React.useState({
 		name: "",
 		link: "",
 	});
 
+  //создание новой карточки в зависимости от открытия-закрытия попапа
 	React.useEffect(() => {
 		setNewPlace({
 			name: "",
@@ -14,15 +21,20 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace, isLoading }) {
 		});
 	}, [isOpen]);
 
+  //функция получения данныз из импутов
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 
+    //запись данных в новую карточку
 		setNewPlace({
+      //добавление данных в массив
 			...newPlace,
+      //имя инпута - его значение
 			[name]: value,
 		});
 	};
 
+  //при сабмите отправка данных на сервер
 	function handleSubmit(e) {
 		e.preventDefault();
 		onAddPlace({
@@ -35,9 +47,9 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace, isLoading }) {
 		<PopupWithForm
 			title="Новое место"
 			name="place-add"
-			buttonSubmitText={!isLoading ? "Создать" : "Сохранение"}
+			buttonSubmitText={!value.isLoading ? "Создать" : "Сохранение"}
 			isOpen={isOpen}
-			onClose={onClose}
+			onClose={value.closeAllPopups}
 			onSubmit={handleSubmit}
 		>
 			<fieldset className="popup__fieldset">

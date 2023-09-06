@@ -1,41 +1,36 @@
 import React from "react";
 import PopupWithForm from "./PopupWithForm";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { AppContext } from "../contexts/AppContext";
+import { useForm } from "../hooks/useForm";
 
-function EditProfilePopup({ isOpen, onClose, onUpdateUser, isLoading }) {
+function EditProfilePopup({ isOpen, onUpdateUser }) {
+  //контент значения данных пользователя
 	const currentUser = React.useContext(CurrentUserContext);
+  //котнент переменной состояния загрузки и функции закрытия попапа
+  const value = React.useContext(AppContext)
 
-	const [name, setName] = React.useState("");
-	const [description, setDescription] = React.useState("");
+  const {values, handleChange, setValues} = useForm({});
 
-	React.useEffect(() => {
-		setName(currentUser.name);
-		setDescription(currentUser.about);
+
+  //обновлени данных пользователя в зависимости от изменения значения и открытия-закрытия попапа
+	React.useEffect(() => {		
+    setValues(currentUser)
 	}, [currentUser, isOpen]);
 
-	function handleChangeName(evt) {
-		setName(evt.target.value);
-	}
-
-	function handleChangeDescription(evt) {
-		setDescription(evt.target.value);
-	}
-
+  //отправка обновленных данных пользователя на сервер
 	function handleSubmit(e) {
 		e.preventDefault();
-		onUpdateUser({
-			name,
-			about: description,
-		});
+		onUpdateUser(values);
 	}
 
 	return (
 		<PopupWithForm
 			title="Редактировать профиль"
 			name="user-edit"
-			buttonSubmitText={!isLoading ? "Сохранить" : "Сохранение"}
+			buttonSubmitText={!value.isLoading ? "Сохранить" : "Сохранение"}
 			isOpen={isOpen}
-			onClose={onClose}
+			onClose={value.closeAllPopups}
 			onSubmit={handleSubmit}
 			children={
 				<fieldset className="popup__fieldset">
@@ -43,7 +38,7 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser, isLoading }) {
 						<input
 							id="name-input"
 							name="name"
-							value={name || ""}
+							value={values.name || ""}
 							placeholder="Имя"
 							required
 							autoComplete="off"
@@ -51,7 +46,7 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser, isLoading }) {
 							type="text"
 							minLength="2"
 							maxLength="40"
-							onChange={handleChangeName}
+							onChange={handleChange}
 						/>
 						<span className="name-input-error popup__input-error"></span>
 					</label>
@@ -59,7 +54,7 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser, isLoading }) {
 						<input
 							id="ocupation-input"
 							name="about"
-							value={description || ""}
+							value={values.about || ""}
 							placeholder="Род занятий"
 							required
 							autoComplete="off"
@@ -67,7 +62,7 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser, isLoading }) {
 							type="text"
 							minLength="2"
 							maxLength="200"
-							onChange={handleChangeDescription}
+							onChange={handleChange}
 						/>
 						<span className="ocupation-input-error popup__input-error"></span>
 					</label>

@@ -1,23 +1,13 @@
 import React from "react";
+import { useForm } from "../hooks/useForm";
 
 const AuthForm = ({ onSubmit, title, buttonSubmitText, ...props }) => {
-	const [formValue, setFormValue] = React.useState({
-		email: "",
-		password: "",
-	});
-
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-
-		setFormValue({
-			...formValue,
-			[name]: value,
-		});
-	};
+	
+  const {values, handleChange, setValues} = useForm({});
 
 	const onSubmitAuthForm = (e) => {
 		e.preventDefault();
-		onSubmit(formValue);
+		onSubmit(values);
 	};
 
 	return (
@@ -29,7 +19,7 @@ const AuthForm = ({ onSubmit, title, buttonSubmitText, ...props }) => {
 				id="email"
 				type="email"
 				placeholder="Email"
-				value={formValue.email || ""}
+				value={values.email || ""}
 				minLength="5"
 				maxLength="50"
 				required
@@ -43,7 +33,7 @@ const AuthForm = ({ onSubmit, title, buttonSubmitText, ...props }) => {
 				id="password"
 				type="password"
 				placeholder="Пароль"
-				value={formValue.password || ""}
+				value={values.password || ""}
 				minLength="4"
 				maxLength="20"
 				required

@@ -1,8 +1,10 @@
 import React from "react";
 import PopupWithForm from "./PopupWithForm";
+import { AppContext } from "../contexts/AppContext";
 
-function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar, isLoading }) {
+function EditAvatarPopup({ isOpen, onUpdateAvatar }) {
 	const avatarRef = React.useRef("");
+	const value = React.useContext(AppContext);
 
 	React.useEffect(() => {
 		avatarRef.current.value = "";
@@ -19,9 +21,9 @@ function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar, isLoading }) {
 		<PopupWithForm
 			title="Обновить аватар"
 			name="avatar"
-			buttonSubmitText={!isLoading ? "Сохранить" : "Сохранение"}
+			buttonSubmitText={!value.isLoading ? "Сохранить" : "Сохранение"}
 			isOpen={isOpen}
-			onClose={onClose}
+			onClose={value.closeAllPopaps}
 			onSubmit={handleSubmit}
 			children={
 				<fieldset className="popup__fieldset">

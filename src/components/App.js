@@ -5,6 +5,7 @@ import ImagePopup from "./ImagePopup";
 import Main from "./Main";
 import PopupWithForm from "./PopupWithForm";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { AppContext } from "../contexts/AppContext";
 import { api } from "../utils/api.js";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
@@ -32,9 +33,23 @@ function App() {
 		id: "",
 		email: "",
 	});
+	//переменная состояния загрузки
 	const [isLoading, setIsLoading] = React.useState(false);
 
 	const navigate = useNavigate();
+
+	// функция, которая принимает функцию запроса
+	function handleSubmit(request) {
+		// изменяем текст кнопки до вызова запроса
+		setIsLoading(true);
+		request()
+			// закрывать попап нужно только в `then`
+			.then(closeAllPopups)
+			// в каждом запросе нужно ловить ошибку
+			.catch(console.error)
+			// в каждом запросе в `finally` нужно возвращать обратно начальный текст кнопки
+			.finally(() => setIsLoading(false));
+	}
 
 	useEffect(() => {
 		tokenCheck();
@@ -56,9 +71,7 @@ function App() {
 						navigate("/", { replace: true });
 					}
 				})
-				.catch((err) => {
-					console.log(err.status);
-				});
+				.catch(console.error);
 		}
 	};
 
@@ -71,9 +84,7 @@ function App() {
 					state.map((c) => (c._id === card._id ? newCard : c))
 				);
 			})
-			.catch((err) => {
-				console.log(err.status);
-			});
+			.catch(console.error);
 	}
 
 	function handleCardDel(card) {
@@ -82,9 +93,7 @@ function App() {
 			.then((res) => {
 				setCards((state) => state.filter((c) => c._id !== card._id));
 			})
-			.catch((err) => {
-				console.log(err.status);
-			});
+			.catch(console.error);
 	}
 
 	useEffect(() => {
@@ -93,9 +102,7 @@ function App() {
 				setCards(initialCards);
 				setCurrentUser(userInfo);
 			})
-			.catch((err) => {
-				console.log(err.status);
-			});
+			.catch(console.error);
 	}, []);
 
 	function handleEditAvatarClick() {
@@ -123,43 +130,26 @@ function App() {
 	}
 
 	function handleUpdateUser({ name, about }) {
-		setIsLoading(true);
-		api
-			.editProfile({ name, about })
-			.then((userInfo) => {
-				setCurrentUser(userInfo);
-				closeAllPopups();
-			})
-			.catch((err) => {
-				console.log(err.status);
-			})
-			.finally(() => setIsLoading());
+		function makeRequest() {
+			return api.editProfile({ name, about }).then(setCurrentUser);
+		}
+		handleSubmit(makeRequest);
 	}
 
 	function handleUpdateAvatar({ avatar }) {
-		setIsLoading(true);
-		api
-			.editAvatar({ avatar })
-			.then((userInfo) => {
-				setCurrentUser(userInfo);
-				closeAllPopups();
-			})
-			.catch((err) => {
-				console.log(err.status);
-			})
-			.finally(() => setIsLoading());
+		function makeRequest() {
+			return api.editAvatar({ avatar }).then(setCurrentUser);
+		}
+		handleSubmit(makeRequest);
 	}
 
 	function handleAddPlaceSubmit({ name, link }) {
-		setIsLoading(true);
-		api
-			.addNewCard({ name, link })
-			.then((newCard) => {
+		function makeRequest() {
+			return api.addNewCard({ name, link }).then((newCard) => {
 				setCards([newCard, ...cards]);
-				closeAllPopups();
-			})
-			.catch(console.error)
-			.finally(() => setIsLoading());
+			});
+		}
+		handleSubmit(makeRequest);
 	}
 
 	const handleRegistrSubmit = (formValue) => {
@@ -192,9 +182,7 @@ function App() {
 					tokenCheck();
 				}
 			})
-			.catch((err) => {
-				console.log(err);
-			});
+			.catch(console.error);
 	};
 
 	const inCaseRegister = () => {
@@ -224,91 +212,89 @@ function App() {
 	};
 
 	return (
-		<CurrentUserContext.Provider value={currentUser}>
-			<div className="page">
-				<Routes>
-					<Route
-						path="/sign-up"
-						element={<Register handleSubmit={handleRegistrSubmit} />}
+		<AppContext.Provider value={{ isLoading, closeAllPopups }}>
+			<CurrentUserContext.Provider value={currentUser}>
+				<div className="page">
+					<Routes>
+						<Route
+							path="/sign-up"
+							element={<Register handleSubmit={handleRegistrSubmit} />}
+						/>
+						<Route path="*" element={<Login />} />
+						<Route
+							path="/sign-in"
+							element={<Login handleLoginSubmit={handleLoginSubmit} />}
+						/>
+						<Route
+							path="/"
+							element={
+								<ProtectedRouteElement loggedIn={isLoggedIn}>
+									<>
+										<Header
+											linkTitle={"Выйти"}
+											linkTo={"/sign-in"}
+											handleExit={handleExit}
+										>
+											{userData.email}
+										</Header>
+										<Main
+											onEditAvatar={handleEditAvatarClick}
+											onEditProfile={handleEditProfileClick}
+											onAddPlace={handleAddPlaceClick}
+											handleCardClick={handleCardClick}
+											handleCardLike={handleCardLike}
+											cards={cards}
+											handleCardDel={handleCardDel}
+										/>
+										<Footer />
+									</>
+								</ProtectedRouteElement>
+							}
+						/>
+					</Routes>
+
+					<EditProfilePopup
+						//открытие попапа
+						isOpen={isEditProfilePopupOpen && "popup_openend"}
+						//обновление данных пользователя на сервере
+						onUpdateUser={handleUpdateUser}
 					/>
-					<Route path="*" element={<Login />} />
-					<Route
-						path="/sign-in"
-						element={<Login handleLoginSubmit={handleLoginSubmit} />}
+
+					<AddPlacePopup
+						isOpen={isAddPlacePopupOpen && "popup_openend"}
+						onAddPlace={handleAddPlaceSubmit}
 					/>
-					<Route
-						path="/"
-						element={
-							<ProtectedRouteElement loggedIn={isLoggedIn}>
-								<>
-									<Header
-										linkTitle={"Выйти"}
-										linkTo={"/sign-in"}
-										handleExit={handleExit}
-									>
-										{userData.email}
-									</Header>
-									<Main
-										onEditAvatar={handleEditAvatarClick}
-										onEditProfile={handleEditProfileClick}
-										onAddPlace={handleAddPlaceClick}
-										handleCardClick={handleCardClick}
-										handleCardLike={handleCardLike}
-										cards={cards}
-										handleCardDel={handleCardDel}
-									/>
-									<Footer />
-								</>
-							</ProtectedRouteElement>
+
+					<PopupWithForm
+						title="Вы уверены?"
+						name="delete-place"
+						buttonSubmitText="Да"
+						onClose={closeAllPopups}
+					/>
+					<EditAvatarPopup
+						isOpen={isEditAvatarPopupOpen && "popup_openend"}
+						onUpdateAvatar={handleUpdateAvatar}
+					/>
+
+					{selectedCard && (
+						<ImagePopup card={selectedCard} onClose={closeAllPopups} />
+					)}
+
+					<InfoTooltip
+						title={
+							isRegister
+								? "Вы успешно зарегистрировались!"
+								: "Что то пошло не так! Попробуйте еще раз!"
 						}
+						imgAlt={isRegister ? "галочка" : "крестик"}
+						imgSrc={isRegister ? imgOk : imgNone}
+						onClose={closeAllPopups}
+						isOpen={isInfoTooltipPopup && "popup_openend"}
+						name={"infoTooltip"}
 					/>
-				</Routes>
-
-				<EditProfilePopup
-					isOpen={isEditProfilePopupOpen && "popup_openend"}
-					onClose={closeAllPopups}
-					onUpdateUser={handleUpdateUser}
-					isLoading={isLoading}
-				/>
-
-				<AddPlacePopup
-					isOpen={isAddPlacePopupOpen && "popup_openend"}
-					onClose={closeAllPopups}
-					onAddPlace={handleAddPlaceSubmit}
-					isLoading={isLoading}
-				/>
-
-				<PopupWithForm
-					title="Вы уверены?"
-					name="delete-place"
-					buttonSubmitText="Да"
-					onClose={closeAllPopups}
-				/>
-				<EditAvatarPopup
-					isOpen={isEditAvatarPopupOpen && "popup_openend"}
-					onClose={closeAllPopups}
-					onUpdateAvatar={handleUpdateAvatar}
-					isLoading={isLoading}
-				/>
-
-				{selectedCard && (
-					<ImagePopup card={selectedCard} onClose={closeAllPopups} />
-				)}
-
-				<InfoTooltip
-					title={
-						isRegister
-							? "Вы успешно зарегистрировались!"
-							: "Что то пошло не так! Попробуйте еще раз!"
-					}
-					imgAlt={isRegister ? "галочка" : "крестик"}
-					imgSrc={isRegister ? imgOk : imgNone}
-					onClose={closeAllPopups}
-					isOpen={isInfoTooltipPopup && "popup_openend"}
-					name={"infoTooltip"}
-				/>
-			</div>
-		</CurrentUserContext.Provider>
+				</div>
+			</CurrentUserContext.Provider>
+		</AppContext.Provider>
 	);
 }
 

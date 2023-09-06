@@ -8,13 +8,18 @@ class Api {
 		this._checkResponse = checkResponse;
 	}
 
-	//загрузка карточек с сервера
+  //универсальный метод проверки запроса
+  _request(url, options) {
+    return fetch(url, options).then(this._checkResponse)
+  }
+
+  //загрузка карточек с сервера
 	getInitialCards() {
 		//запрос на сервер на получение карточек
-		return fetch(`${this._url}/cards`, {
+		return this._request(`${this._url}/cards`, {
 			headers: this._headers,
 			//получив промис проверяем статус
-		}).then(this._checkResponse);
+		})
 	}
 
 	//получение данных пользователя с сервера
@@ -97,13 +102,14 @@ class Api {
 }
 
 //токен для авторизации
-const token = "6ea24768-e3b3-4cce-a68a-3bff993d63e5";
+const token = "6eeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGY4M2JlZmEwYjkwNzRiYjhiYjQ0MmQiLCJpYXQiOjE2OTM5OTYzMjMsImV4cCI6MTY5NDYwMTEyM30.EdZwltUwU0AIuxLNu2BokFATIOa9nWlkS1oFxCV8jOwa24768-e3b3-4cce-a68a-3bff993d63e5";
 //создаем элемент api
 export const api = new Api(
-	"https://nomoreparties.co/v1/cohort-66",
+	"https://api.mesto.motopeter.nomoredomainsicu.ru",
 	{
 		authorization: token,
 		"Content-Type": "application/json",
 	},
+  //функция проверки ответа от сервера
 	checkResponse
 );

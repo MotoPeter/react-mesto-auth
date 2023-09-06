@@ -1,8 +1,10 @@
+//компонент регистрации 
 import React from "react";
 import Header from "./Header";
 import AuthForm from "./AuthForm";
 import { Link } from "react-router-dom";
 
+//передаем функцию сабмита
 const Register = ({ handleSubmit }) => {
 	return (
 		<div>
