@@ -28,10 +28,11 @@ export const authorization = (password, email, token) => {
 export const getContent = (token) => {
 	return fetch(`${BASE_URL}/users/me`, {
 		method: "GET",
+    credentials: 'include',
 		headers: {
 			Accept: "application/json",
 			"Content-Type": "application/json",
-			authorization: token,
+			//authorization: token,
 		},
 	}).then(checkResponse);
 };
